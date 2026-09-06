@@ -6,6 +6,7 @@ void setup() {
 // devin
 // zakkyy nihhh
 //kk
+// jaki lagi cuy
 }
 
 void loop() {
