@@ -33,7 +33,9 @@ void setup() {
 // thaya iot
 // hafid lagi
 // devin
+// zakkyy nihhh
 //kk
+// jaki lagi cuy
 }
 
 void loop() {
