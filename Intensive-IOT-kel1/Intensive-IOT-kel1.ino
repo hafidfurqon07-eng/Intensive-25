@@ -6,8 +6,8 @@
 // WIFI
 // ======================================================
 
-#define WIFI_SSID "Rlnd"
-#define WIFI_PASSWORD "ininyadigantidulumas"
+#define WIFI_SSID "hafeddd"
+#define WIFI_PASSWORD "12345678"
 
 // ======================================================
 // FIREBASE
@@ -31,7 +31,7 @@ bool signupOK = false;
 // ======================================================
 
 unsigned long lastSend = 0;
-const unsigned long interval = 2000;
+const unsigned long interval = 2000; // kirim setiap 2 detik
 
 // ======================================================
 // SETUP
@@ -82,8 +82,11 @@ void setup() {
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
 
-  // Random seed
-  randomSeed(micros());
+  // ====================================================
+  // RANDOM SEED
+  // ====================================================
+
+  randomSeed(analogRead(34));
 
   Serial.println("Firebase siap!");
 }
@@ -101,50 +104,56 @@ void loop() {
       lastSend = millis();
 
       // =================================================
-      // DATA SIMULASI
+      // GENERATE DATA RANDOM
       // =================================================
 
-      // Hydration Level: 0 - 100 %
-      float hydrationLevel = random(450, 901) / 10.0;
-
-      // TEWL: g/m²/h
+      float uv = random(0, 120) / 10.0;
+      float kelembapan = random(400, 801) / 10.0;
       float tewl = random(50, 201) / 100.0;
-
-      // UV Index: 0 - 11
-      float uvIndex = random(0, 121) / 10.0;
 
       // =================================================
       // SERIAL MONITOR
       // =================================================
 
-      Serial.println();
-      Serial.println("==============================");
+      Serial.println("======================");
 
-      Serial.print("Hydration Level : ");
-      Serial.print(hydrationLevel, 1);
+      Serial.print("UV          : ");
+      Serial.println(uv, 1);
+
+      Serial.print("Kelembapan  : ");
+      Serial.print(kelembapan, 1);
       Serial.println(" %");
 
-      Serial.print("TEWL            : ");
+      Serial.print("TEWL        : ");
       Serial.print(tewl, 2);
       Serial.println(" g/m2/h");
 
-      Serial.print("UV Index        : ");
-      Serial.println(uvIndex, 1);
-
       // =================================================
-      // KIRIM HYDRATION LEVEL
+      // KIRIM UV
       // =================================================
 
-      if (Firebase.RTDB.setFloat(
-            &fbdo,
-            "/sensor/hydration_level",
-            hydrationLevel)) {
+      if (Firebase.RTDB.setFloat(&fbdo, "/sensor/uv", uv)) {
 
-        Serial.println("Hydration berhasil dikirim");
+        Serial.println("UV terkirim");
 
       } else {
 
-        Serial.println("Gagal kirim Hydration");
+        Serial.println("Gagal kirim UV");
+        Serial.println(fbdo.errorReason());
+
+      }
+
+      // =================================================
+      // KIRIM KELEMBAPAN
+      // =================================================
+
+      if (Firebase.RTDB.setFloat(&fbdo, "/sensor/kelembapan", kelembapan)) {
+
+        Serial.println("Kelembapan terkirim");
+
+      } else {
+
+        Serial.println("Gagal kirim kelembapan");
         Serial.println(fbdo.errorReason());
 
       }
@@ -153,12 +162,9 @@ void loop() {
       // KIRIM TEWL
       // =================================================
 
-      if (Firebase.RTDB.setFloat(
-            &fbdo,
-            "/sensor/tewl",
-            tewl)) {
+      if (Firebase.RTDB.setFloat(&fbdo, "/sensor/tewl", tewl)) {
 
-        Serial.println("TEWL berhasil dikirim");
+        Serial.println("TEWL terkirim");
 
       } else {
 
@@ -167,25 +173,7 @@ void loop() {
 
       }
 
-      // =================================================
-      // KIRIM UV INDEX
-      // =================================================
-
-      if (Firebase.RTDB.setFloat(
-            &fbdo,
-            "/sensor/uv_index",
-            uvIndex)) {
-
-        Serial.println("UV Index berhasil dikirim");
-
-      } else {
-
-        Serial.println("Gagal kirim UV Index");
-        Serial.println(fbdo.errorReason());
-
-      }
-
-      Serial.println("==============================");
+      Serial.println("======================");
     }
   }
 }
